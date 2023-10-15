@@ -1,0 +1,42 @@
+"""
+Logging functionality for GUI to call (on start button)
+"""
+import serial
+import numpy as np
+import time
+import csv
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+
+def log_data(COM_port, stop_event):
+    ser = None
+    try:
+        ser = serial.Serial(COM_port, 115200, timeout=1)
+        time.sleep(2)
+        print(f"Start logging on {COM_port}")
+        with open("sensor_data.csv", mode="a", newline="") as file:
+            writer = csv.writer(file)
+            # Check if file is empty, then write headers
+            if file.tell() == 0:
+                writer.writerow(["Time", "X", "Y", "Z"])
+
+            # Loop to read and record data
+            while not stop_event.is_set():
+                line = ser.readline()
+                if line:
+                    str_line = line.decode().strip()
+                    # print(str_line)
+                    # Arduino sends data in the format "x, y, z" in uT
+                    # lambda func converts to mG, sensor precision of 6842 LSB/gauss
+                    x, y, z = map(lambda val: round(float(val) / 6842 * 1000, 3), str_line.split(","))
+                    timestamp = datetime.now().strftime("%m-%d %H:%M:%S")
+                    writer.writerow([timestamp, x, y, z])
+                time.sleep(0.01)
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        if ser is not None:
+            ser.close()
+        print("Serial port closed and logging stopped.")

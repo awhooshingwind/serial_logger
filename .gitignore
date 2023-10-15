@@ -1,0 +1,46 @@
+# Python-related files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+__init__.py
+
+# Virtual environment
+venv/
+env/
+/.env
+
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# IDE/Editor specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.user
+*.suo
+*.cache
+*.project
+*.pyc
+*.pyo
+*.db
+*.db-journal
+*.log
+*.DS_Store
+
+# Dependency directories
+__pycache__/
+node_modules/
+
+# PyInstaller build and distribution directories
+build/
+dist/
