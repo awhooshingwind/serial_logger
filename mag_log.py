@@ -58,6 +58,12 @@ class App:
         )
         self.plot_button.pack(side=tk.BOTTOM, padx=5, pady=5)
 
+        # Monitor Button
+        self.monitor_button = tk.Button(
+            root, text="Monitor", command=self.launch_monitor
+        )
+        self.monitor_button.pack(side=tk.BOTTOM, padx=5, pady=5)
+
         # Thread stop event
         self.stop_event = threading.Event()
 
@@ -86,6 +92,24 @@ class App:
         self.status_label.config(text="Status: Idle")
         # Stop the logging thread
         stop_logging(self.stop_event)
+    
+    def launch_monitor(self):
+        # Create new window for monitoring
+        self.monitor_window = tk.Toplevel(self.root)
+        self.monitor_window.title("Monitor")
+
+        # Add widgets to display the monitoring data
+        # For now, let's just add a label as a placeholder
+        # In future, this can be replaced with actual monitoring logic/widgets
+        self.monitor_label = tk.Label(self.monitor_window, text="Monitoring Data Here")
+        self.monitor_label.pack(padx=20, pady=20)
+    
+    def update_monitor(self):
+    # Update the monitor label or any other widget
+        self.monitor_label.config(text="Updated Monitoring Data")
+    # Call this method again after 1000ms (1 second)
+        self.monitor_window.after(1000, self.update_monitor)
+
 
 # --- Main ---
 root = tk.Tk()
