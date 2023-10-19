@@ -1,6 +1,8 @@
 """
-Simple GUI for starting/stopping arduino serial magnetometer data logging
-with option for plotting from generated csv
+
+Program for monitoring arduino serial magnetometer data 
+with option to log to sensor_data.csv and plot from that file
+
 """
 
 import tkinter as tk
