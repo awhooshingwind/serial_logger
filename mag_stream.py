@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
 import serial.tools.list_ports
-from logger import log_data
+from logger import get_data
 import plotter
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
@@ -40,7 +40,7 @@ class App:
 
         # Ensure the logging thread is stopped before moving on
         if hasattr(self, "logging_thread"):
-            self.logging_thread.join()
+            self.logging_thread.join(timeout=5.0)
 
         # Destroy the main window
         self.root.destroy()
@@ -70,12 +70,18 @@ class App:
         self.button_frame = tk.Frame(root)
         self.button_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        # Start Button
-        self.start_button = tk.Button(
-            self.button_frame, text="Start", command=self.start_logging
+        # Stream Button
+        self.stream_button = tk.Button(
+            self.button_frame, text="Stream", command=self.start_stream
         )
-        self.start_button.pack(side=tk.LEFT, padx=5, pady=5, fill=tk.X, expand=True)
+        self.stream_button.pack(side=tk.LEFT, padx=5, pady=5, fill=tk.X, expand=True)
 
+        # Log Button
+        self.log_button = tk.Button(
+            self.button_frame, text="Log", command=self.start_logging
+        )
+
+        self.log_button.pack(side=tk.LEFT, padx=5, pady=5, fill=tk.X, expand=True)
         # Stop Button
         self.stop_button = tk.Button(
             self.button_frame, text="Stop", command=self.stop_logging, state=tk.DISABLED
@@ -121,6 +127,9 @@ class App:
         self.stop_event = threading.Event()
 
     def start_logging(self):
+        self.start_stream(log_flag=True)
+    
+    def start_stream(self, log_flag=False):
         selected_port = self.com_port.get()
         # selected_port = "A"  # For testing only
         if not selected_port:
@@ -128,29 +137,32 @@ class App:
                 "Error", "Please select a COM port before starting logging."
             )
             return
-        self.start_button.config(state=tk.DISABLED)
+        self.log_button.config(state=tk.DISABLED)
+        self.stream_button.config(state=tk.DISABLED)
         self.stop_button.config(state=tk.NORMAL)
         self.status_label.config(text=f"Status: Logging on {selected_port}")
         # Reset the stop event
         self.stop_event.clear()
         # Create and start a new logging thread
         self.logging_thread = threading.Thread(
-            target=log_data,
+            target=get_data,
             args=(
                 selected_port,
                 self.stop_event,
+                log_flag,
                 self.append_to_buffer,
             ),
             daemon=True,
         )
         self.logging_thread.start()
 
-    def append_to_buffer(self, timestamp, x, y, z):
+    def append_to_buffer(self, x, y, z):
         # This function will be called by the logger to add data
-        App.data_buffer.append((timestamp, x, y, z))
+        App.data_buffer.append((x, y, z))
 
     def stop_logging(self):
-        self.start_button.config(state=tk.NORMAL)
+        self.log_button.config(state=tk.NORMAL)
+        self.stream_button.config(state=tk.NORMAL)
         self.stop_button.config(state=tk.DISABLED)
         self.status_label.config(text="Status: Idle")
         # Stop the logging thread
@@ -169,7 +181,7 @@ class App:
         # Create new window for monitoring
         self.monitor_window = tk.Toplevel(self.root)
         self.monitor_window.title("Monitor")
-        self.monitor_window.geometry("800x650")
+        self.monitor_window.geometry("900x650")
 
         # Frame for the monitor labels
         self.monitor_label_frame = tk.Frame(self.monitor_window)
@@ -190,13 +202,13 @@ class App:
         )
         self.static_label_y = tk.Label(
             self.monitor_label_frame,
-            text=" Y:",
+            text="   Y:",
             font=("Arial", 40),
             fg="orange",
         )
         self.static_label_z = tk.Label(
             self.monitor_label_frame,
-            text=" Z:",
+            text="   Z:",
             font=("Arial", 40),
             fg="green",
         )
@@ -264,7 +276,7 @@ class App:
         if not self.root:
             return
         if App.data_buffer and hasattr(self, "monitor_window"):
-            timestamp, x, y, z = App.data_buffer[-1]  # Get the latest reading
+            x, y, z = App.data_buffer[-1]  # Get the latest reading
             # Update the dynamic labels
             self.dynamic_label_x.config(text="{:6.2f}".format(x))
             self.dynamic_label_y.config(text="{:6.2f}".format(y))
