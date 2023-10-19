@@ -11,6 +11,7 @@ from logger import log_data
 import plotter
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 import numpy as np
 from collections import deque
 
@@ -24,7 +25,7 @@ def stop_logging(stop_event):
 
 
 class App:
-    MAX_BUFFER_SIZE = 24000  # 5min of data at 80 Hz sampling rate
+    MAX_BUFFER_SIZE = int(2.88e6)  # 1hr of data at 80 Hz sampling rate
     data_buffer = deque(maxlen=MAX_BUFFER_SIZE)
 
     def close_main_window(self):
@@ -166,7 +167,7 @@ class App:
         # Create new window for monitoring
         self.monitor_window = tk.Toplevel(self.root)
         self.monitor_window.title("Monitor")
-        self.monitor_window.geometry("800x600")
+        self.monitor_window.geometry("800x650")
 
         # Frame for the monitor labels
         self.monitor_label_frame = tk.Frame(self.monitor_window)
@@ -230,6 +231,13 @@ class App:
         # Create a Figure and a Canvas to embed the plot in tkinter
         self.fig, self.ax = plt.subplots(figsize=(4, 7))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.monitor_window)
+
+        # Add the navigation toolbar
+        self.toolbar = NavigationToolbar2Tk(self.canvas, self.monitor_window)
+        self.toolbar.update()
+        self.canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        # Pack the canvas
         self.canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
         # Create the lines for x, y, and z data with empty lists
@@ -285,7 +293,7 @@ class App:
 
             # Check if the monitor window is still available before scheduling the next update
             if hasattr(self, "monitor_window"):
-                self.after_id = self.monitor_window.after(1000, self.update_monitor)
+                self.after_id = self.monitor_window.after(600, self.update_monitor)
 
     def close_monitor(self):
         # Cancel the after updates
