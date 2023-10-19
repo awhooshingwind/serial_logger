@@ -9,10 +9,26 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 
-def log_data(COM_port, stop_event):
+# For testing
+class MockSerial:
+    def readline(self):
+        # Generate fake data for testing
+        fake_x = np.random.randint(0, 1201) - 600
+        fake_y = np.random.randint(0, 1201) - 600
+        fake_z = np.random.randint(0, 1201) - 600
+        fake_data = "{},{},{}\n".format(fake_x, fake_y, fake_z)
+        return fake_data.encode()
+
+    def close(self):
+        pass
+
+
+def log_data(COM_port, stop_event, callback=None):
     ser = None
     try:
+        # ser = MockSerial() # For testing
         ser = serial.Serial(COM_port, 115200, timeout=1)
+
         time.sleep(2)
         print(f"Start logging on {COM_port}")
         with open("sensor_data.csv", mode="a", newline="") as file:
@@ -29,9 +45,14 @@ def log_data(COM_port, stop_event):
                     # print(str_line)
                     # Arduino sends data in the format "x, y, z" in uT
                     # lambda func converts to mG, sensor precision of 6842 LSB/gauss
-                    x, y, z = map(lambda val: round(float(val) / 6842 * 1000, 3), str_line.split(","))
-                    timestamp = datetime.now().strftime("%m-%d %H:%M:%S")
+                    x, y, z = map(
+                        lambda val: round(float(val) / 6842 * 1000, 3),
+                        str_line.split(","),
+                    )
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     writer.writerow([timestamp, x, y, z])
+                    if callback:
+                        callback(timestamp, x, y, z)
                 time.sleep(0.01)
 
     except Exception as e:
