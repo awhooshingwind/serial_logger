@@ -49,9 +49,7 @@ def plot_sensor_data(detail_level="Low"):
     plot_data = downsampled
 
     # Plot sampled data
-    time_scaling = 1
-    if num_rows > 1e6:
-        time_scaling = 3600
+    time_scaling = 3600 #in terms of relative hours
 
     plt.plot(
         plot_data.index / time_scaling, plot_data["X"], label="X"
@@ -78,4 +76,4 @@ def plot_sensor_data(detail_level="Low"):
     plt.show()
 
 
-# plot_sensor_data()
+# plot_sensor_data() # for testing

@@ -140,7 +140,7 @@ class App:
         self.log_button.config(state=tk.DISABLED)
         self.stream_button.config(state=tk.DISABLED)
         self.stop_button.config(state=tk.NORMAL)
-        self.status_label.config(text=f"Status: Logging on {selected_port}")
+        self.status_label.config(text=f"Status: {'Logging' if log_flag else 'Streaming'} on {selected_port}")
         # Reset the stop event
         self.stop_event.clear()
         # Create and start a new logging thread
@@ -185,7 +185,7 @@ class App:
 
         # Frame for the monitor labels
         self.monitor_label_frame = tk.Frame(self.monitor_window)
-        self.monitor_label_frame.pack(padx=20, pady=20)
+        self.monitor_label_frame.pack(padx=20, pady=5)
 
         # Static text labels
         self.static_label_title = tk.Label(
@@ -326,6 +326,6 @@ class App:
 
 # --- Main ---
 root = tk.Tk()
-root.geometry("275x225")  # Adjusted for added status label
+root.geometry("275x225")
 app = App(root)
 root.mainloop()
