@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 def plot_sensor_data(detail_level="Low"):
     plt.close("all")
+    fig, ax = plt.subplots(3,1, figsize=(8, 5))
     # Load data
     data = pd.read_csv("sensor_data.csv")
     # data = pd.read_csv("fake_sensor_data.csv") # for testing
@@ -30,7 +31,7 @@ def plot_sensor_data(detail_level="Low"):
     if detail_level == "High":
         n = max(1, num_rows // 1000000)
     elif detail_level == "Low":
-        n = max(10, num_rows // 100000)
+        n = max(10, num_rows // 250000)
     else:  # Default to "Medium"
         n = max(5, num_rows // 500000)
 
@@ -51,27 +52,27 @@ def plot_sensor_data(detail_level="Low"):
     # Plot sampled data
     time_scaling = 3600  # in terms of relative hours
 
-    plt.plot(plot_data.index / time_scaling, plot_data["X"], label="X")
-    plt.plot(plot_data.index / time_scaling, plot_data["Y"], label="Y")
-    plt.plot(plot_data.index / time_scaling, plot_data["Z"], label="Z")
+    ax[0].plot(plot_data.index / time_scaling, plot_data["X"], label="X", color='blue')
+    ax[1].plot(plot_data.index / time_scaling, plot_data["Y"], label="Y", color='orange')
+    ax[2].plot(plot_data.index / time_scaling, plot_data["Z"], label="Z", color='green')
 
     # # Plot data
     # plt.plot(data["Relative Time"], data["X"], label="X")
     # plt.plot(data["Relative Time"], data["Y"], label="Y")
     # plt.plot(data["Relative Time"], data["Z"], label="Z")
 
-    # Label axes
-    plt.xlabel("Relative Time (h)")
-    plt.ylabel("Magnetic Field (mG)")
+    for a in ax:
+        a.grid(True)
+        
 
     # Add title and legend
-    plt.title("Magnetic Field vs Relative Time")
-    plt.grid()
-    plt.legend()
-    plt.tight_layout()
+    fig.suptitle("Magnetic Field vs Relative Time")
+    fig.supxlabel("Relative Time [h]")
+    fig.supylabel("Magnetic Field [mG]")
+    fig.legend(loc='outside upper right')
 
     # Display plot
     plt.show()
 
 
-# plot_sensor_data() # for testing
+# plot_sensor_data(detail_level='Low') # for testing
