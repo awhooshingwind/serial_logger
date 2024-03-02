@@ -46,9 +46,9 @@ def get_data(COM_port, stop_event, log_flag, callback=None):
                     str_line = line.decode().strip()
                     # print(str_line)
                     # Arduino sends data in the format "x, y, z" in uT
-                    # lambda func converts to mG, sensor precision of 6842 LSB/gauss
+                    # lambda func converts to mG
                     x, y, z = map(
-                        lambda val: round(float(val) / 6842 * 1000, 3),
+                        lambda val: float(val) * 10,
                         str_line.split(","),
                     )
                     if log_flag:
@@ -57,7 +57,7 @@ def get_data(COM_port, stop_event, log_flag, callback=None):
     
                     if callback:
                         callback(x, y, z)
-                time.sleep(0.01)
+                time.sleep(0.005)
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")

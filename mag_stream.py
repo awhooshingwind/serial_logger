@@ -27,7 +27,7 @@ def stop_logging(stop_event):
 
 
 class App:
-    MAX_BUFFER_SIZE = int(2.88e6)  # 1hr of data at 80 Hz sampling rate
+    MAX_BUFFER_SIZE = int(2.7e4)  # 1hr of data at 80 Hz sampling rate
     data_buffer = deque(maxlen=MAX_BUFFER_SIZE)
 
     def close_main_window(self):
@@ -307,7 +307,7 @@ class App:
 
             # Check if the monitor window is still available before scheduling the next update
             if hasattr(self, "monitor_window"):
-                self.after_id = self.monitor_window.after(600, self.update_monitor)
+                self.after_id = self.monitor_window.after(10, self.update_monitor)
 
     def close_monitor(self):
         # Cancel the after updates

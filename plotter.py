@@ -14,7 +14,7 @@ def plot_sensor_data(detail_level="Low"):
     # data = pd.read_csv("fake_sensor_data.csv") # for testing
 
     # Generate relative time in seconds given the sample rate
-    sample_rate = 80  # Hz
+    sample_rate = 155  # Hz
     data["Relative Time"] = data.index * (1 / sample_rate)
 
     # Convert columns to numeric, coercing errors to NaN
@@ -39,7 +39,7 @@ def plot_sensor_data(detail_level="Low"):
 
     sampled = data.iloc[::n]
 
-    window_size = 80  # This would be equivalent to 1 second at 80Hz
+    window_size = 155  # This would be equivalent to 1 second at 80Hz
 
     if num_rows > 100000:
         window_size = 72000  # approx 15min window intervals for larger datasets
